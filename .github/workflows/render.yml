@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
       - run: npm install --no-audit --no-fund
       - run: node render.mjs
         env: { CHUNK: "${{ matrix.chunk }}", NCHUNKS: "4", FPS: "24", DUR: "60" }
@@ -26,6 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
       - uses: actions/download-artifact@v4
         with: { path: chunks, pattern: chunk-*, merge-multiple: true }
       - run: |
