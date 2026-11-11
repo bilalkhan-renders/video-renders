@@ -62,8 +62,8 @@
     boilSeed('river' + seed);
     paint(rectPts(-300, y0, W + 600, y1 - y0, 3), { wash: col, fill: WATER_DK, fillOp: 60, bleed: .06, tex: .5, ink: null });
     boilSeed('river patch' + seed);
-    paint(ellPts(W * .3, (y0 + y1) / 2, W * .34, (y1 - y0) * .42, 22, 4), { fill: mixCol(col, PAL.sky, .4), fillOp: 60, bleed: .3, tex: .5, ink: null });
-    paint(ellPts(W * .74, (y0 + y1) / 2, W * .3, (y1 - y0) * .4, 22, 4), { fill: mixCol(col, PAL.cream, .25), fillOp: 45, bleed: .3, tex: .5, ink: null });
+    paint(ellPts(W * .3, (y0 + y1) / 2, W * .34, (y1 - y0) * .34, 22, 4), { fill: mixCol(col, PAL.sky, .4), fillOp: 42, bleed: .3, tex: .5, ink: null });
+    paint(ellPts(W * .74, (y0 + y1) / 2, W * .3, (y1 - y0) * .32, 22, 4), { fill: mixCol(col, PAL.cream, .25), fillOp: 30, bleed: .3, tex: .5, ink: null });
   }
 
   function palm(x, gy, s, t, seed) {
@@ -125,7 +125,7 @@
         const fx = x + sd * s * .07 + swg * s * .13, fy = gy - Math.max(0, swg) * s * .05;
         boilSeed('figleg' + tag + sd);
         inkLine([[x + sd * s * .07, hipY + s * .04], [x + sd * s * .08 + swg * s * .06, (hipY + gy) / 2 + s * .04], [fx, fy]],
-          Math.max(1.6, s * .05), '#5A4632', 'ink', .35);
+          Math.max(1.6, Math.min(6.5, s * .05)), '#5A4632', 'ink', .35);
         boilSeed('figfoot' + tag + sd);
         paint(ellPts(fx + s * .02, gy - 1, s * .05, s * .018, 8), { wash: '#3A2C1E', ink: null });
       }
@@ -142,7 +142,7 @@
       const sx = x + sd * s * .14, sy = shoY + s * .03 + bob;
       boilSeed('figarm' + tag + sd);
       inkLine([[sx, sy], [(sx + hp[0]) / 2 + sd * s * .05, (sy + hp[1]) / 2 + s * .04], hp],
-        Math.max(1.6, s * .048), robe, 'ink', .4);
+        Math.max(1.6, Math.min(7, s * .048)), robe, 'ink', .4);
       boilSeed('fighand' + tag + sd);
       paint(ellPts(hp[0], hp[1], s * .032, s * .032, 9), { wash: skin, ink: null });
     }
@@ -263,7 +263,7 @@
     }
     for (const [lx, ph] of [[-.2, 0], [-.1, 2], [.16, 1], [.25, 3]]) {
       boilSeed('ox leg' + seed + ' ' + lx);
-      inkLine([[x + s * lx, gy - s * .24], [x + s * lx + Math.sin(t * 1.4 + ph) * 1.5, gy - s * .02]], Math.max(1.6, s * .028), dk, 'ink', .3);
+      inkLine([[x + s * lx, gy - s * .24], [x + s * lx + Math.sin(t * 1.4 + ph) * 1.5, gy - s * .02]], Math.max(2.4, s * .03), mixCol(col, PAL.ink, .55), 'ink', .3);
     }
     boilSeed('ox head' + seed);
     paint(ellPts(x + s * .36, gy - s * .34, s * .085, s * .11, 14, 1), { wash: col, fill: dk, fillOp: 40, ink: PAL.ink, sw: .9 });
@@ -273,8 +273,8 @@
       inkLine([[x + s * .39, gy - s * .44], [x + s * .42, gy - s * .62]], Math.max(1.6, s * .022), dk, 'ink', .4);
     } else {
       boilSeed('ox horns' + seed);
-      inkLine([[x + s * .33, gy - s * .44], [x + s * .3, gy - s * .56], [x + s * .38, gy - s * .62]], Math.max(1.4, s * .02), '#E8DCC2', 'ink', .5);
-      inkLine([[x + s * .4, gy - s * .44], [x + s * .46, gy - s * .55], [x + s * .54, gy - s * .56]], Math.max(1.4, s * .02), '#E8DCC2', 'ink', .5);
+      inkLine([[x + s * .33, gy - s * .44], [x + s * .31, gy - s * .52], [x + s * .37, gy - s * .55]], Math.max(1.2, s * .013), '#E8DCC2', 'ink', .5);
+      inkLine([[x + s * .4, gy - s * .44], [x + s * .44, gy - s * .51], [x + s * .5, gy - s * .52]], Math.max(1.2, s * .013), '#E8DCC2', 'ink', .5);
     }
     boilSeed('ox tail' + seed);
     inkLine([[x - s * .3, gy - s * .44], [x - s * .36, gy - s * .2 + Math.sin(t * 2.2 + seed) * s * .03]], Math.max(1.3, s * .016), dk, 'ink', .4);
@@ -286,6 +286,21 @@
     const pts = ellPts(cx, cy, rx, ry, 52, 0);
     pts.push(pts[0].slice());
     inkLine(pts, sw, col, 'ink', .35);
+  }
+
+  // A jade bi disc: a ring of overlapping painted blobs (a thick ink ring balloons at this scale).
+  function jadeDisc(cx, cy, r, seed) {
+    for (let i = 0; i < 16; i++) {
+      const a = i / 16 * Math.PI * 2;
+      boilSeed('jade' + seed + ' ' + i);
+      paint(ellPts(cx + Math.cos(a) * r, cy + Math.sin(a) * r, r * .31, r * .31, 10, 1),
+        { wash: '#2E7D5B', fill: '#256B4C', fillOp: 55, ink: null });
+    }
+    boilSeed('jade hi' + seed);
+    for (let i = 0; i < 4; i++) {
+      const a = -2.4 + i * .38;
+      paint(ellPts(cx + Math.cos(a) * r, cy + Math.sin(a) * r, r * .12, r * .12, 8), { wash: '#7FC79B', washOp: 170, ink: null });
+    }
   }
 
   function wheatPatch(x, y, w, h, n, seed) {
@@ -319,19 +334,23 @@
     // the wide river
     riverBand(812, 1030, mixCol('#2A3A66', '#C77B52', dp * .85), 1);
     shimmer(838, 1000, t, mixCol('#8EC3E6', '#FFD9A0', dp), 16, 1);
-    // lone farmer silhouette with a hoe, working slowly
-    const fx = 1170, fgy = 902, fs = 252;
+    // lone farmer silhouette with a hoe, working slowly on the bank (dedicated
+    // silhouette painter: one dark tone, robe to the ground, hoe clear of the body)
+    const fx = 1150, fgy = 808, fs = 238;
     const cyc = frac(lt / 5.4), raise = Math.pow(Math.max(0, Math.sin(cyc * Math.PI)), 1.4);
-    const sil = mixCol('#14142B', '#2A2138', dp);
-    const f = figure(fx, fgy, fs, {
-      robe: sil, robeDk: sil, skin: '#1C1C30', hair: '#10101E', tag: 'hookfarmer', t,
-      handF: [fx + fs * .3, fgy - fs * .34 - raise * fs * .13],
-      handB: [fx + fs * .22, fgy - fs * .3 - raise * fs * .1]
-    });
+    const sil = mixCol('#12122A', '#2A2138', dp);
+    boilSeed('hook farmer robe');
+    paint([[fx - fs * .2, fgy], [fx - fs * .13, fgy - fs * .62], [fx - fs * .05, fgy - fs * .78],
+           [fx + fs * .07, fgy - fs * .78], [fx + fs * .15, fgy - fs * .62], [fx + fs * .22, fgy]],
+      { wash: sil, fill: sil, fillOp: 70, ink: null });
+    boilSeed('hook farmer head');
+    paint(ellPts(fx + fs * .01, fgy - fs * .86, fs * .085, fs * .095, 16, 1), { wash: sil, ink: null });
+    const hy = fgy - fs * .52 - raise * fs * .12, hx = fx + fs * .24;
+    boilSeed('hook farmer arms');
+    inkLine([[fx + fs * .1, fgy - fs * .68], [hx, hy]], 5.5, sil, 'ink', .35);
     boilSeed('hook hoe');
-    const hx = fx + fs * .3, hy = fgy - fs * .34 - raise * fs * .13;
-    inkLine([[hx, hy], [fx + fs * .46, fgy - fs * .02 + raise * fs * .1]], 4.5, '#0E0E1C', 'ink', .3);
-    inkLine([[fx + fs * .46, fgy - fs * .02 + raise * fs * .1], [fx + fs * .55, fgy - fs * .05 + raise * fs * .1]], 3.4, '#0E0E1C', 'ink', .3);
+    inkLine([[hx, hy], [fx + fs * .44, fgy - fs * .02 + raise * fs * .08]], 4.2, '#4A3421', 'ink', .25);
+    inkLine([[fx + fs * .44, fgy - fs * .02 + raise * fs * .08], [fx + fs * .53, fgy - fs * .06 + raise * fs * .08]], 3.4, '#4A3421', 'ink', .25);
     camEnd();
     if (t < 0.8) { boilSeed('hook fade'); paint(rectPts(-60, -60, W + 120, H + 120), { wash: PAL.paper, washOp: Math.round(255 * (1 - t / 0.8)), ink: null }); }
   }
@@ -412,33 +431,33 @@
     for (let i = 0; i < 3; i++) palm(760 + i * 90, 1005, 120, t, 30 + i);
     // scribe, cross-legged on a mat, painting glyphs on papyrus
     boilSeed('scribe mat');
-    paint(rectPts(1330, 1006, 300, 20, 2), { wash: PAL.clay, fill: PAL.clayDk, fillOp: 55, ink: PAL.ink, sw: .8 });
-    figure(1470, 1012, 252, { robe: '#EDE3CC', robeDk: '#C9B489', skin: SKIN_DK, head: 'nemes', sit: true, tag: 'egscribe', t,
-      handF: [1522, 918], handB: [1396, 952] });
-    // papyrus sheet across his lap (drawn over the robe)
+    paint(rectPts(1318, 1018, 330, 20, 2), { wash: PAL.clay, fill: PAL.clayDk, fillOp: 55, ink: PAL.ink, sw: .8 });
+    figure(1470, 1022, 300, { robe: '#EDE3CC', robeDk: '#C9B489', skin: SKIN_DK, head: 'nemes', sit: true, tag: 'egscribe', t,
+      handF: [1528, 940], handB: [1392, 972] });
+    // papyrus sheet across his lap (drawn over the robe, low enough to leave him visible)
     boilSeed('papyrus');
-    push(); translate(1476, 928); rotate(-.06);
-    paint(rrPts(-98, -52, 196, 118, 8, 1), { wash: '#F2E3BC', fill: '#E4CF9E', fillOp: 60, ink: PAL.ink, sw: .9 });
+    push(); translate(1478, 956); rotate(-.06);
+    paint(rrPts(-78, -46, 156, 94, 8, 1), { wash: '#F2E3BC', fill: '#E4CF9E', fillOp: 60, ink: PAL.ink, sw: .9 });
     // pictorial glyph marks: waves, an eye, a bird, a sun disc, reeds — pictures, not letters
     boilSeed('glyph waves');
-    inkLine([[-78, -26], [-58, -34], [-38, -26], [-18, -34], [2, -26]], 2, PAL.teal, 'inkfine', .5);
-    inkLine([[-78, -8], [-58, -16], [-38, -8], [-18, -16], [2, -8]], 2, PAL.teal, 'inkfine', .5);
+    inkLine([[-64, -22], [-46, -29], [-28, -22], [-10, -29], [6, -22]], 2, PAL.teal, 'inkfine', .5);
+    inkLine([[-64, -6], [-46, -13], [-28, -6], [-10, -13], [6, -6]], 2, PAL.teal, 'inkfine', .5);
     boilSeed('glyph eye');
-    paint(ellPts(48, -24, 22, 11, 14), { wash: PAL.cream, ink: PAL.ink, sw: 1 });
-    paint(ellPts(48, -24, 7, 7, 10), { wash: PAL.ink, ink: null });
+    paint(ellPts(42, -20, 18, 9, 14), { wash: PAL.cream, ink: PAL.ink, sw: 1 });
+    paint(ellPts(42, -20, 6, 6, 10), { wash: PAL.ink, ink: null });
     boilSeed('glyph bird');
-    paint(through([[24, 26], [38, 12], [52, 14], [62, 24], [48, 30], [34, 34]], 3), { wash: PAL.indigo, ink: PAL.ink, sw: .7 });
-    inkLine([[58, 16], [70, 19]], 1.6, PAL.ink, 'inkfine', .3);
+    paint(through([[18, 20], [30, 8], [44, 10], [54, 18], [40, 24], [26, 27]], 3), { wash: PAL.indigo, ink: PAL.ink, sw: .7 });
+    inkLine([[50, 12], [60, 15]], 1.6, PAL.ink, 'inkfine', .3);
     boilSeed('glyph sun');
-    ringLine(-48, 30, 13, 13, 3.4, PAL.ochre, 51);
+    ringLine(-40, 26, 11, 11, 3.4, PAL.ochre, 51);
     boilSeed('glyph reeds');
-    inkLine([[-8, 44], [-4, 22]], 2, PAL.sap, 'inkfine', .3);
-    inkLine([[4, 44], [8, 22]], 2, PAL.sap, 'inkfine', .3);
-    inkLine([[16, 44], [18, 24]], 2, PAL.sap, 'inkfine', .3);
+    inkLine([[-8, 36], [-4, 16]], 2, PAL.sap, 'inkfine', .3);
+    inkLine([[4, 36], [8, 16]], 2, PAL.sap, 'inkfine', .3);
+    inkLine([[16, 36], [18, 18]], 2, PAL.sap, 'inkfine', .3);
     pop();
     // his reed brush, from hand to papyrus
     boilSeed('reed brush');
-    inkLine([[1522, 918], [1502, 936]], 2.4, WOOD_DK, 'inkfine', .3);
+    inkLine([[1528, 940], [1508, 954]], 2.4, WOOD_DK, 'inkfine', .3);
     birds(t, 3, 120, 6, 20);
     camEnd();
   }
@@ -461,6 +480,9 @@
     }
     boilSeed('uruk gate');
     paint(rrPts(896, 486, 128, 76, 10, 1), { wash: '#4A3421', ink: PAL.ink, sw: 1 });
+    // city ground the houses and tower stand on
+    boilSeed('uruk ground');
+    paint(rectPts(-300, 556, W + 600, 344, 3), { wash: '#D3AC72', fill: SAND_DK, fillOp: 35, bleed: .06, tex: .55, ink: null });
     // the temple tower, centre — solid stepped terraces
     const tiers = [[560, 96], [416, 86], [288, 78]];
     let zy = 806;
@@ -500,7 +522,7 @@
     }
     // people in the street — small walkers drifting slowly
     const folk = [
-      { b: 120, sp: 15, s: 118, robe: '#A8573C', head: 'turban' }, { b: 560, sp: -11, s: 104, robe: '#7A6A8A', head: 'bare' },
+      { b: 120, sp: 15, s: 118, robe: '#A8573C', head: 'turban' }, { b: 760, sp: -11, s: 104, robe: '#7A6A8A', head: 'bare' },
       { b: 980, sp: 13, s: 122, robe: '#4A7A8A', head: 'cap' }, { b: 1380, sp: -16, s: 100, robe: '#B98A4A', head: 'bare' },
       { b: 300, sp: 9, s: 92, robe: '#8A9A6A', head: 'cap' }
     ];
@@ -508,11 +530,11 @@
       const fx = 200 + ((f.b + lt * f.sp) % 1560 + 1560) % 1560;
       figure(fx, 1018 - (i % 2) * 26, f.s, { robe: f.robe, head: f.head, t, walk: .8, phase: lt * 5.2 + i * 1.7, tag: 'urukfolk' + i });
     });
-    // a donkey led through the street
-    ox(600, 1004, 215, '#9A8A76', t, 7, { hump: false, ears: true });
-    figure(452, 1000, 118, { robe: '#C7B299', head: 'turban', t, tag: 'uruklead' });
+    // a donkey led through the street, in the open between the stalls
+    ox(1052, 1006, 205, '#9A8A76', t, 7, { hump: false, ears: true });
+    figure(1214, 1002, 118, { robe: '#C7B299', head: 'turban', t, tag: 'uruklead' });
     boilSeed('donkey rope');
-    inkLine([[508, 936], [668, 922]], 1.8, WOOD_DK, 'inkfine', .4);
+    inkLine([[1152, 940], [1128, 934]], 1.8, WOOD_DK, 'inkfine', .4);
     camEnd();
   }
 
@@ -550,25 +572,25 @@
     for (let i = 0; i < 3; i++) paint(rectPts(320, 838 - i * 17, 92, 15, 1), { wash: '#C9A06A', fill: '#A87C44', fillOp: 55, ink: PAL.ink, sw: .7 });
     // low table with the wet clay tablet
     boilSeed('table');
-    paint(rectPts(742, 664, 660, 34, 2), { wash: WOOD, fill: WOOD_DK, fillOp: 65, ink: PAL.ink, sw: 1 });
-    paint(rectPts(770, 698, 26, 92, 1), { wash: WOOD_DK, ink: null });
-    paint(rectPts(1348, 698, 26, 92, 1), { wash: WOOD_DK, ink: null });
+    paint(rectPts(706, 664, 660, 34, 2), { wash: WOOD, fill: WOOD_DK, fillOp: 65, ink: PAL.ink, sw: 1 });
+    paint(rectPts(734, 698, 26, 92, 1), { wash: WOOD_DK, ink: null });
+    paint(rectPts(1312, 698, 26, 92, 1), { wash: WOOD_DK, ink: null });
     boilSeed('tablet');
-    paint([[896, 604], [1304, 604], [1334, 664], [866, 664]], { wash: '#C9A06A', fill: '#A87C44', fillOp: 60, bleed: .04, ink: PAL.ink, sw: 1.1 });
-    paint([[924, 614], [1276, 614], [1296, 654], [904, 654]], { wash: '#D9B57E', ink: null });
+    paint([[860, 604], [1268, 604], [1298, 664], [830, 664]], { wash: '#C9A06A', fill: '#A87C44', fillOp: 60, bleed: .04, ink: PAL.ink, sw: 1.1 });
+    paint([[888, 614], [1240, 614], [1260, 654], [868, 654]], { wash: '#D9B57E', ink: null });
     // wedge marks appear one by one as he works (deterministic from lt)
     const totalW = 32, done = Math.floor(seg(lt, 1.5, dur - 2) * totalW);
     for (let i = 0; i < done; i++) {
-      const cx = 946 + (i % 8) * 40, cy = 620 + Math.floor(i / 8) * 10;
+      const cx = 910 + (i % 8) * 40, cy = 619 + Math.floor(i / 8) * 11;
       boilSeed('wedge' + i);
-      paint([[cx, cy], [cx + 10, cy + 2], [cx + 2, cy + 7]], { wash: '#6E4B2C', ink: null });
+      paint([[cx, cy], [cx + 11, cy + 2], [cx + 2, cy + 8]], { wash: '#6E4B2C', ink: null });
     }
     // the scribe — big, seated, his hand moving to the next wedge
     const ci = Math.min(done, totalW - 1);
-    const wx = 950 + (ci % 8) * 40, wy = 606 + Math.floor(ci / 8) * 10;
+    const wx = 914 + (ci % 8) * 40, wy = 605 + Math.floor(ci / 8) * 11;
     const cyc = frac(lt / 1.15), dip = Math.sin(Math.min(1, cyc * 1.6) * Math.PI) * 12;
-    figure(545, 952, 470, { robe: '#E4D6B8', robeDk: '#C4AC7E', skin: SKIN_DK, sit: true, tag: 'wrscribe', t,
-      handF: [wx + 14, wy - 42 + dip], handB: [428, 806] });
+    figure(585, 952, 470, { robe: '#E4D6B8', robeDk: '#C4AC7E', skin: SKIN_DK, sit: true, tag: 'wrscribe', t,
+      handF: [wx + 14, wy - 42 + dip], handB: [468, 806] });
     boilSeed('reed stylus');
     inkLine([[wx + 14, wy - 42 + dip], [wx + 2, wy + 2 + dip * .4]], 3.2, WOOD_DK, 'inkfine', .3);
     // dust motes drifting in the light shaft
@@ -585,6 +607,7 @@
   function scWheel(t, lt, dur) {
     camDrift(lt, dur, -14, .05);
     sky('#B7D3DE', '#EFE3C0', '#F5E3B0');
+    birds(t, 3, 120, 33, 16);
     boilSeed('wb wall');
     paint(rectPts(-300, 556, W + 600, 84, 2), { wash: '#B98A4A', fill: '#9A6F38', fillOp: 55, ink: PAL.ink, sw: .9 });
     mudHouse(120, 560, 210, 130, { tag: 'wbh1' });
@@ -592,9 +615,11 @@
     palm(1860, 640, 170, t, 80);
     boilSeed('wb yard');
     paint(rectPts(-300, 640, W + 600, 500, 3), { wash: '#C8A06A', fill: SAND_DK, fillOp: 45, bleed: .06, tex: .55, ink: null });
-    // — the potter at his wheel (left)
+    // — the potter at his wheel (left): figure first, then wheel and pot in front of his lap
     boilSeed('potter stand');
     paint(rectPts(388, 856, 22, 76, 1), { wash: WOOD_DK, ink: null });
+    figure(400, 936, 308, { robe: '#C7B299', robeDk: '#A08B6C', skin: SKIN_DK, sit: true, tag: 'wbpotter', t,
+      handF: [446, 852], handB: [354, 852] });
     const potA = t * 2.6;
     boilSeed('potter wheel');
     paint(ellPts(400, 934, 106, 24, 22, 1), { wash: '#8A6238', fill: WOOD_DK, fillOp: 60, ink: PAL.ink, sw: 1 });
@@ -605,13 +630,11 @@
     boilSeed('the pot');
     paint(through([[366, 922], [356, 872], [372, 838], [392, 824], [408, 824], [428, 838], [444, 872], [434, 922]], 4),
       { wash: '#B0763F', fill: '#8A5A2C', fillOp: 60, bleed: .05, ink: PAL.ink, sw: 1 });
-    figure(400, 936, 308, { robe: '#C7B299', robeDk: '#A08B6C', skin: SKIN_DK, sit: true, tag: 'wbpotter', t,
-      handF: [446, 852], handB: [354, 852] });
     // — ox cart (centre), wheels just beginning to turn
-    ox(856, 916, 300, '#D8CBB2', t, 8, { flip: -1 });
+    ox(838, 916, 300, '#D8CBB2', t, 8, { flip: -1 });
     boilSeed('cart shafts');
-    inkLine([[742, 856], [1032, 822]], 5, WOOD, 'ink', .3);
-    inkLine([[748, 884], [1036, 850]], 5, WOOD, 'ink', .3);
+    inkLine([[930, 850], [1032, 820]], 5, WOOD, 'ink', .3);
+    inkLine([[934, 878], [1036, 848]], 5, WOOD, 'ink', .3);
     boilSeed('cart bed');
     paint(rectPts(1026, 756, 316, 58, 2), { wash: WOOD, fill: WOOD_DK, fillOp: 65, bleed: .05, ink: PAL.ink, sw: 1 });
     paint(ellPts(1108, 742, 62, 30, 14), { wash: '#C9A86A', fill: '#A8884C', fillOp: 60, ink: null });
@@ -666,6 +689,9 @@
     shimmer(336, 448, t, '#D8ECF8', 18, 7);
     felucca(500 + lt * 3, 398, 155, t, { sail: false });
     felucca(1360 - lt * 2, 436, 125, t, { sail: false });
+    // ground the town stands on
+    boilSeed('indus town ground');
+    paint(rectPts(-300, 596, W + 600, 210, 3), { wash: '#DCC08A', fill: SAND_DK, fillOp: 30, bleed: .06, tex: .55, ink: null });
     // farming town of mudbrick houses
     const town = [[170, 648, 150, 102], [348, 632, 128, 88], [500, 654, 168, 112], [694, 638, 138, 94], [180, 736, 132, 90], [336, 748, 158, 100], [522, 730, 142, 92]];
     town.forEach(([hx, hy, hw, hh], i) => mudHouse(hx, hy, hw, hh, { tag: 'indus' + i }));
@@ -676,7 +702,7 @@
     paint(rectPts(-300, 792, W + 600, 330, 3), { wash: '#C8A06A', fill: SAND_DK, fillOp: 40, bleed: .06, tex: .55, ink: null });
     boilSeed('wheat field bg');
     paint(rectPts(56, 824, 700, 226, 2), { wash: '#D9A83C', fill: '#B98A2E', fillOp: 45, ink: null });
-    wheatPatch(80, 880, 640, 130, 34, 11);
+    wheatPatch(80, 880, 640, 130, 46, 11);
     boilSeed('cotton field bg');
     paint(rectPts(1160, 824, 712, 226, 2), { wash: PAL.sap, fill: '#587C40', fillOp: 50, ink: null });
     for (let i = 0; i < 42; i++) {
@@ -724,7 +750,6 @@
   function scStone(t, lt, dur) {
     camDrift(lt, dur, -16, .05, 520);
     sky('#9FB2C8', '#E8D9B0', '#F7DFA6');
-    sunDisc(298, 672, 52, '#FFC766', .65);
     // chalk plain
     boilSeed('plain');
     paint(rectPts(-600, 548, W + 1200, 620, 3), { wash: '#86A860', ink: null });
@@ -734,10 +759,11 @@
       boilSeed('chalk' + i);
       paint(ellPts(hash(i * 7 + 8) * W, 620 + hash(i * 3 + 5) * 400, 4 + hash(i) * 6, 2.4, 7), { wash: PAL.cream, washOp: 130, ink: null });
     }
+    sunDisc(300, 466, 50, '#FFC766', .6);
     // bank and ditch rings (ellipses — a circle lying on the plain)
     const CX = 980, CY = 700;
-    ringLine(CX, CY, 356, 106, 40, '#9DB06B', 21);
-    ringLine(CX, CY, 310, 92, 52, mixCol('#86A860', '#4A5A33', .55), 22);
+    ringLine(CX, CY, 356, 106, 13, '#9DB06B', 21);
+    ringLine(CX, CY, 310, 92, 15, mixCol('#86A860', '#4A5A33', .38), 22);
     boilSeed('circle floor');
     paint(ellPts(CX, CY, 272, 78, 36, 2), { wash: '#93B26A', fill: '#86A860', fillOp: 60, ink: null });
     // tall timber posts in a ring — SOLID painted shapes, back ones first
@@ -759,7 +785,7 @@
     boilSeed('ditch front');
     const front = [];
     for (let i = 0; i <= 26; i++) { const a = i / 26 * Math.PI; front.push([CX + Math.cos(a) * 310, CY + Math.sin(a) * 92]); }
-    inkLine(front, 40, mixCol('#86A860', '#4A5A33', .55), 'ink', .35);
+    inkLine(front, 13, mixCol('#86A860', '#4A5A33', .38), 'ink', .35);
     // farmers: one digging, one with a stone axe, one carrying
     const dig = Math.pow(Math.max(0, Math.sin(frac(lt / 3.8) * Math.PI)), 1.3);
     const dg = figure(560, 838, 138, { robe: '#8A6A4A', skin: SKIN_LT, tag: 'stdig', t,
@@ -827,8 +853,10 @@
     inkLine([[600, 742], [592, 712], [600, 692]], 4.6, '#E8DCC2', 'ink', .5);
     for (const lx of [640, 690, 756, 796]) {
       boilSeed('buffalo leg' + lx);
-      inkLine([[lx, 786], [lx, 838]], 6, '#463F37', 'ink', .3);
+      inkLine([[lx, 792], [lx, 844]], 6.5, '#33291F', 'ink', .3);
     }
+    boilSeed('buffalo muzzle');
+    paint(ellPts(562, 780, 17, 12, 10), { wash: '#6E6156', ink: PAL.ink, sw: .6 });
     boilSeed('buffalo tail');
     inkLine([[818, 716], [838, 776 + Math.sin(t * 2.4) * 7]], 3, '#463F37', 'ink', .4);
     figure(884, 838, 172, { robe: '#8A9A6A', robeDk: '#6B7A4E', skin: SKIN_DK, head: 'cone', tag: 'chfarmer', t, handF: [820, 762], handB: [928, 780] });
@@ -845,8 +873,7 @@
     figure(1564, 1014, 302, { robe: '#7A6A8A', robeDk: '#5D4F6E', skin: SKIN_DK, tag: 'chcraft', t,
       handF: [1506, 706], handB: [1652, 872] });
     glow(1506, 646, 130, '#7FC79B', .32);
-    ringLine(1506, 646, 58, 58, 27, '#2E7D5B', 41);
-    ringLine(1506, 646, 58, 58, 4, '#7FC79B', 42);
+    jadeDisc(1506, 646, 46, 41);
     // mist on the far water
     for (let i = 0; i < 3; i++) {
       boilSeed('ch mist' + i);
@@ -942,6 +969,9 @@
     boilSeed('lit window');
     paint(rectPts(1562, 676, 46, 42, 1), { wash: '#FFC766', washOp: 240, ink: null });
     glow(1585, 697, 90, '#FFC766', .5);
+    // near bank in front of the river — the family sits on this, not in the water
+    boilSeed('closing bank');
+    paint(rectPts(-300, 928, W + 600, 190, 3), { wash: mixCol('#6B5138', '#2E2434', p), fill: mixCol('#54381F', '#1E1B38', p), fillOp: 50, bleed: .06, tex: .55, ink: null });
     // the family around a small fire
     figure(818, 992, 208, { robe: PAL.clay, robeDk: PAL.clayDk, skin: SKIN_DK, sit: true, tag: 'closeA', t, handF: [902, 936], handB: [760, 950] });
     figure(1096, 992, 196, { robe: '#3A6B6E', robeDk: '#2A4E50', skin: SKIN_DK, sit: true, tag: 'closeB', t, handF: [1012, 936], handB: [1152, 950] });
