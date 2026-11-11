@@ -1,0 +1,42 @@
+name: render
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [scene.html, render.mjs, package.json, .github/workflows/render.yml]
+permissions:
+  contents: write
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        chunk: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
+      - run: node render.mjs
+        env: { CHUNK: "${{ matrix.chunk }}", NCHUNKS: "4", FPS: "24", DUR: "60" }
+      - uses: actions/upload-artifact@v4
+        with: { name: "chunk-${{ matrix.chunk }}", path: "chunk-${{ matrix.chunk }}.mp4" }
+  stitch:
+    needs: render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: chunks, pattern: chunk-*, merge-multiple: true }
+      - run: |
+          ls chunks
+          printf "file 'chunks/chunk-0.mp4'\nfile 'chunks/chunk-1.mp4'\nfile 'chunks/chunk-2.mp4'\nfile 'chunks/chunk-3.mp4'\n" > list.txt
+          ffmpeg -y -v error -f concat -safe 0 -i list.txt -c:v libx264 -pix_fmt yuv420p -crf 20 -movflags +faststart final.mp4
+          ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 final.mp4
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          mkdir -p output && cp final.mp4 output/final.mp4
+          git add output/final.mp4
+          git commit -m "render output" || echo "nothing to commit"
+          git push
