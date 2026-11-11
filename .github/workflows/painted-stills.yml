@@ -1,0 +1,17 @@
+name: painted-stills
+on:
+  workflow_dispatch:
+jobs:
+  stills:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
+        working-directory: painted
+      - run: node stills.mjs
+        working-directory: painted
+      - uses: actions/upload-artifact@v4
+        with: { name: "doc-stills", path: painted/stills-out }
