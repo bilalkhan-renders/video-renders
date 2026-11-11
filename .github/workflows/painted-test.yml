@@ -1,0 +1,16 @@
+name: painted-test
+on:
+  workflow_dispatch:
+jobs:
+  speedtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
+        working-directory: painted
+      - run: node speedtest.mjs
+        working-directory: painted
+      - uses: actions/upload-artifact@v4
+        with: { name: painted-frames, path: painted/frames }
