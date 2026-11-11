@@ -113,8 +113,8 @@
   function bellPost(t) {
     const px = 1560, topY = 330;
     boilSeed('post');
-    inkLine([[px, GROUND], [px, topY]], 12, '#5A4A75', 'ink', .3);
-    inkLine([[px, topY], [px - 150, topY + 8]], 9, '#5A4A75', 'ink', .3);
+    inkLine([[px, GROUND], [px, topY]], 12, '#7A6248', 'ink', .3);
+    inkLine([[px, topY], [px - 150, topY + 8]], 9, '#7A6248', 'ink', .3);
     paint(ellPts(px - 40, GROUND + 6, 210, 15, 18, 2), { wash: PAL.indigo, ink: null });
     // the bell — swings BY ITSELF from 3.2s
     const sw = t < 3.2 ? 0 : 0.5 * Math.sin((t - 3.2) * 6.4) * Math.min(1, (t - 3.2) / 0.9) * (t > 7.6 ? 0.55 : 1);
