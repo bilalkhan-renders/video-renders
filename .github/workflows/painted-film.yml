@@ -1,0 +1,21 @@
+name: painted-film
+on:
+  workflow_dispatch:
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
+        working-directory: painted
+      - run: node render-film.mjs
+        working-directory: painted
+        env: { CHUNK: "${{ matrix.chunk }}", NCHUNKS: "20", FPS: "8", DUR: "326" }
+      - uses: actions/upload-artifact@v4
+        with: { name: "film-chunk-${{ matrix.chunk }}", path: painted/frames }

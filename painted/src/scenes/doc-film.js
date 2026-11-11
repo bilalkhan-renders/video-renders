@@ -254,30 +254,79 @@
   function ox(x, gy, s, col, t, seed, o = {}) {
     const flip = o.flip || 1;
     push(); translate(x, 0); scale(flip, 1); translate(-x, 0);
-    const dk = mixCol(col, PAL.ink, .3);
+    // Deepened tones throughout: the old painter washed the body in the raw pale
+    // `col` and drew the legs as thin ink strokes, so the animal read as a
+    // floating blob. Everything structural is now a solid painted shape.
+    const bodyWash = mixCol(col, '#8A6A42', .3);
+    const bodyFill = mixCol(col, PAL.ink, .34);
+    const dk = mixCol(col, PAL.ink, .52);
+    const dkr = mixCol(col, PAL.ink, .68);
+    const leg = (lx, ph, tone, fillOp) => {
+      const sw = Math.sin(t * 1.4 + ph) * s * .013;
+      boilSeed('ox leg' + seed + ' ' + lx);
+      paint(ribbon([[x + s * lx, gy - s * .27], [x + s * lx + sw * .4, gy - s * .14], [x + s * lx + sw, gy - s * .025]], s * .058, s * .042),
+        { wash: tone, fill: tone, fillOp, bleed: .04, ink: null });
+      boilSeed('ox hoof' + seed + ' ' + lx);
+      paint(ellPts(x + s * lx + sw, gy - s * .014, s * .034, s * .013, 9), { wash: '#2E2620', ink: null });
+    };
+    // ground shadow first: it is what stops the animal floating
+    boilSeed('ox shadow' + seed);
+    paint(ellPts(x + s * .02, gy - s * .012, s * .42, s * .05, 20, 1), { wash: '#4A3826', washOp: 78, ink: null });
+    // far legs and the tail, behind the body
+    leg(-.19, 2, dk, 66); leg(.17, 0, dk, 66);
+    boilSeed('ox tail' + seed);
+    paint(ribbon([[x - s * .3, gy - s * .45], [x - s * .355, gy - s * .3], [x - s * .345 + Math.sin(t * 2.2 + seed) * s * .02, gy - s * .15]], s * .028, s * .012),
+      { wash: dk, fill: dk, fillOp: 70, ink: null });
+    boilSeed('ox tuft' + seed);
+    paint(ellPts(x - s * .345 + Math.sin(t * 2.2 + seed) * s * .02, gy - s * .12, s * .02, s * .042, 9), { wash: dkr, ink: null });
+    // the body: a barrel with shoulder, chest and a belly line, not an ellipse
     boilSeed('ox body' + seed);
-    paint(ellPts(x, gy - s * .36, s * .30, s * .165, 22, 1.5), { wash: col, fill: dk, fillOp: 45, bleed: .05, ink: PAL.ink, sw: 1 });
+    paint(through([[x - s * .315, gy - s * .4], [x - s * .27, gy - s * .485], [x - s * .1, gy - s * .525], [x + s * .1, gy - s * .525],
+                   [x + s * .24, gy - s * .47], [x + s * .315, gy - s * .39], [x + s * .3, gy - s * .27], [x + s * .21, gy - s * .195],
+                   [x - s * .05, gy - s * .172], [x - s * .24, gy - s * .2], [x - s * .315, gy - s * .28], [x - s * .315, gy - s * .4]], 4),
+      { wash: bodyWash, fill: bodyFill, fillOp: 68, bleed: .05, ink: PAL.ink, sw: 1 });
+    boilSeed('ox belly' + seed);
+    paint(ellPts(x - s * .01, gy - s * .225, s * .23, s * .07, 16), { wash: dk, washOp: 64, ink: null });
     if (o.hump !== false) {
       boilSeed('ox hump' + seed);
-      paint(ellPts(x + s * .1, gy - s * .5, s * .09, s * .06, 12), { wash: col, ink: null });
+      paint(ellPts(x + s * .1, gy - s * .545, s * .1, s * .062, 12), { wash: bodyWash, fill: bodyFill, fillOp: 60, ink: null });
     }
-    for (const [lx, ph] of [[-.2, 0], [-.1, 2], [.16, 1], [.25, 3]]) {
-      boilSeed('ox leg' + seed + ' ' + lx);
-      inkLine([[x + s * lx, gy - s * .24], [x + s * lx + Math.sin(t * 1.4 + ph) * 1.5, gy - s * .02]], Math.max(2.4, s * .03), mixCol(col, PAL.ink, .55), 'ink', .3);
+    // neck: a solid tapered wedge running from the shoulder down to the head
+    boilSeed('ox neck' + seed);
+    paint(ribbon([[x + s * .21, gy - s * .45], [x + s * .3, gy - s * .4], [x + s * .375, gy - s * .355]], s * .135, s * .105),
+      { wash: bodyWash, fill: mixCol(col, PAL.ink, .4), fillOp: 70, bleed: .04, ink: null });
+    // near legs, in front of the body
+    leg(.235, 1, dkr, 76); leg(-.125, 3, dkr, 76);
+    // ---- the head, clearly separated at the end of the neck
+    const hx = x + s * .43, hy = gy - s * .335;
+    if (o.ears) {
+      // the donkey: two long upright ears
+      boilSeed('ox ears' + seed);
+      paint(ellPts(hx - s * .032, hy - s * .155, s * .021, s * .088, 10, .5, -.22), { wash: dk, fill: dk, fillOp: 70, ink: PAL.ink, sw: .7 });
+      paint(ellPts(hx + s * .042, hy - s * .148, s * .021, s * .085, 10, .5, .3), { wash: dk, fill: dk, fillOp: 70, ink: PAL.ink, sw: .7 });
+    } else {
+      // horns: pale tapered crescents rising from the crown, bases behind the head
+      boilSeed('ox horns' + seed);
+      paint(ribbon([[hx - s * .008, hy - s * .075], [hx - s * .055, hy - s * .135], [hx - s * .115, hy - s * .15]], s * .027, s * .005),
+        { wash: '#EFE3C2', fill: '#EFE3C2', fillOp: 85, ink: null });
+      paint(ribbon([[hx + s * .038, hy - s * .08], [hx + s * .085, hy - s * .13], [hx + s * .14, hy - s * .128]], s * .027, s * .005),
+        { wash: '#EFE3C2', fill: '#EFE3C2', fillOp: 85, ink: null });
+      // smaller side ears tucked under the horns
+      boilSeed('ox ears' + seed);
+      paint(ellPts(hx - s * .062, hy - s * .045, s * .048, s * .017, 10, .5, -.55), { wash: dk, fill: dk, fillOp: 70, ink: null });
+      paint(ellPts(hx + s * .075, hy - s * .05, s * .046, s * .016, 10, .5, .5), { wash: dk, fill: dk, fillOp: 70, ink: null });
     }
     boilSeed('ox head' + seed);
-    paint(ellPts(x + s * .36, gy - s * .34, s * .085, s * .11, 14, 1), { wash: col, fill: dk, fillOp: 40, ink: PAL.ink, sw: .9 });
-    if (o.ears) {
-      boilSeed('ox ears' + seed);
-      inkLine([[x + s * .34, gy - s * .44], [x + s * .3, gy - s * .62]], Math.max(1.6, s * .022), dk, 'ink', .4);
-      inkLine([[x + s * .39, gy - s * .44], [x + s * .42, gy - s * .62]], Math.max(1.6, s * .022), dk, 'ink', .4);
-    } else {
-      boilSeed('ox horns' + seed);
-      inkLine([[x + s * .33, gy - s * .44], [x + s * .31, gy - s * .52], [x + s * .37, gy - s * .55]], Math.max(1.2, s * .013), '#E8DCC2', 'ink', .5);
-      inkLine([[x + s * .4, gy - s * .44], [x + s * .44, gy - s * .51], [x + s * .5, gy - s * .52]], Math.max(1.2, s * .013), '#E8DCC2', 'ink', .5);
-    }
-    boilSeed('ox tail' + seed);
-    inkLine([[x - s * .3, gy - s * .44], [x - s * .36, gy - s * .2 + Math.sin(t * 2.2 + seed) * s * .03]], Math.max(1.3, s * .016), dk, 'ink', .4);
+    paint(through([[hx - s * .058, hy - s * .078], [hx + s * .005, hy - s * .102], [hx + s * .055, hy - s * .06], [hx + s * .088, hy + s * .012],
+                   [hx + s * .068, hy + s * .07], [hx + s * .012, hy + s * .098], [hx - s * .038, hy + s * .062], [hx - s * .062, hy - s * .005],
+                   [hx - s * .058, hy - s * .078]], 4),
+      { wash: bodyWash, fill: bodyFill, fillOp: 70, bleed: .04, ink: PAL.ink, sw: .9 });
+    boilSeed('ox muzzle' + seed);
+    paint(ellPts(hx + s * .066, hy + s * .042, s * .03, s * .04, 10), { wash: dkr, washOp: 120, ink: null });
+    paint(ellPts(hx + s * .08, hy + s * .032, s * .006, s * .008, 7), { wash: PAL.ink, ink: null });
+    boilSeed('ox eye' + seed);
+    paint(ellPts(hx + s * .014, hy - s * .026, s * .0125, s * .0155, 9), { wash: PAL.ink, ink: null });
+    paint(ellPts(hx + s * .019, hy - s * .033, s * .004, s * .005, 6), { wash: PAL.cream, washOp: 200, ink: null });
     pop();
   }
 
